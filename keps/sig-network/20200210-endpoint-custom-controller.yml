@@ -47,48 +47,49 @@ status: implementable
 
 ## Summary
 
-This KEP is provide a well-known label to Services to interworking Service and 
+This KEP is to provide a well-known label to Services for interworking Services and 
 Endpoints/EndpointSlices with custom controllers.
 
 ## Motivation
 
-Currently Kubernetes EndpointSlice has label `endpointslice.kubernetes.io/managed-by` 
-which identifies the endpointslice manager and it allows service to be managed by custom 
-controller by chaning to other value, however, Kubernetes EndpointSlice controller 
-automatically creates another EndpointSlice when the different value is set in the label,
+Currently Kubernetes EndpointSlice has a label `endpointslice.kubernetes.io/managed-by` 
+which identifies the endpointslice manager and it allows services to be managed by custom 
+controllers by changing to another value. However, Kubernetes EndpointSlice controller 
+automatically creates another EndpointSlice when a different value is set in the label,
 `endpointslice.kubernetes.io/managed-by`.
 
 
 Custom endpoint/endpointslice controller would like to manage their endpoint/endpointslices 
 by themselves. 
-On the other side, regarding kube-proxy iptables,  kube-proxy already provides well-known label, 
-`service.kubernetes.io/service-proxy-name`, to delegate its management to custom proxy.
+
+On the other hand, regarding kube-proxy iptables, kube-proxy already provides a well-known label, 
+`service.kubernetes.io/service-proxy-name`, which is used to delegate its management to a custom proxy.
 To manage EndpointSlice by custom endpoint controller, Kubernetes EndpointSlice controller 
-need similar label, `service.kubernetes.io/managed-by`, which allows Kubernetes 
-EndpointSlice controller to ignore it and to delegate the management to custom controller. 
+needs a similar label, `service.kubernetes.io/managed-by`, which allows Kubernetes 
+EndpointSlice controller to ignore it and to delegate the management to a custom controller. 
 
 ### Goals
 
-   * Allowing custom endpoint/endpointslice controller to manage endpoints/endpointslices.
-   * Providing the label, `service.kubernetes.io/managed-by` to identify the manager of the Service to create Endpoints/EndpointSlices
+   * Allow custom endpoint/endpointslice controller to manage endpoints/endpointslices.
+   * Provide the label, `service.kubernetes.io/managed-by` to identify the manager of the Service to be able to create Endpoints/EndpointSlices
 
 ### Non-Goals
 
    * This KEP does not change any semantics in the Endpoint/EndpointSlice 
-   * This KEP does not change any behavior of the Service without the label, `service.kubernetes.io/managed-by`
+   * This KEP does not change any behavior of Services without the label, `service.kubernetes.io/managed-by`
 
 ## Proposal
 
-The proposed soltion is to introduce new well-known label, `service.kubernetes.io/managed-by` 
-to Service and Kubernetes Endpoint/EndpointSlice controller delegates the management to 
+The proposed soltion is to introduce a new "well-known label", `service.kubernetes.io/managed-by` 
+to Services and Kubernetes Endpoint/EndpointSlice controller delegates the management to 
 custom controller.
 
 ### User Stories [optional]
 
 #### Service for custom controller
 
-The following YAML is for the Service for custom controller. `service.kubernetes.io/service-proxy-name` is added to avoid kube-proxy to inject iptables rules for the service (it is already implemented in Kubernetes) and `service.kubernetes.io/managed-by` is newly added to avoid endpoint/endpointslice controller to generate endpoints/endpointslices for the service.
-In this case, custom controllers will generate endpoints/endpointslices by themselves and custom controller manages them.
+The following YAML is for the Service for a custom controller. `service.kubernetes.io/service-proxy-name` is added to avoid kube-proxy to inject iptables rules for the service (which is already implemented in Kubernetes) and `service.kubernetes.io/managed-by` is newly added to avoid endpoint/endpointslice controller to generate endpoints/endpointslices for the service.
+In this case, custom controllers will generate endpoints/endpointslices by themselves and a custom controller manages them.
 
 ```
 ---
